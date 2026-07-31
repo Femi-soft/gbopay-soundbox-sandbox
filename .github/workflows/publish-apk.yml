@@ -1,0 +1,24 @@
+name: Publish APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct and verify APK
+        shell: bash
+        run: |
+          cat apk-parts/part-* > GboPay-Soundbox-Sandbox-v0.2.0.apk
+          echo "cacad8837d2d954a88292c946548918bd9efa249e328ff0662786f5d1fde1576  GboPay-Soundbox-Sandbox-v0.2.0.apk" | sha256sum --check
+
+      - name: Attach APK to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v0.2.0 GboPay-Soundbox-Sandbox-v0.2.0.apk --clobber
